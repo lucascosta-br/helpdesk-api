@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping(name = "/api/v1/chamados")
+@RequestMapping("/api/v1/chamados")
 @RequiredArgsConstructor
 public class ChamadoController {
 
@@ -45,6 +45,5 @@ public class ChamadoController {
 
         return ResponseEntity.ok(response);
     }
-
 
 }

@@ -4,6 +4,7 @@ import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.TecnicoRequestDTO;
 import com.lucascostabr.dto.response.TecnicoResponseDTO;
 import com.lucascostabr.enums.TipoPerfil;
+import com.lucascostabr.exception.ResourceNotFoundException;
 import com.lucascostabr.mapper.TecnicoMapper;
 import com.lucascostabr.repository.TecnicoRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +45,14 @@ public class TecnicoService {
         logger.info("Buscando um Técnico!");
 
         return tecnicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Técnico não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
     }
 
     public TecnicoResponseDTO atualizar(Long id, TecnicoRequestDTO dto) {
         logger.info("Atualizando um Técnico!");
 
         Tecnico entity = tecnicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Técnico não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
 
         entity.setNome(dto.nome());
         entity.setEmail(dto.email());
@@ -67,7 +68,7 @@ public class TecnicoService {
         logger.info("Deletando um Técnico!");
 
         tecnicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Técnico não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
 
         tecnicoRepository.deleteById(id);
     }

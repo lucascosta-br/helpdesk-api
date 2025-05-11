@@ -3,6 +3,7 @@ package com.lucascostabr.service;
 import com.lucascostabr.domain.Anexo;
 import com.lucascostabr.domain.Chamado;
 import com.lucascostabr.dto.response.AnexoResponseDTO;
+import com.lucascostabr.exception.FileNotSavedException;
 import com.lucascostabr.repository.AnexoRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class AnexoService {
                 anexo.setChamado(chamado);
                 anexos.add(anexo);
             } catch (IOException e) {
-                throw new RuntimeException("Erro ao salvar anexo", e);
+                throw new FileNotSavedException("Erro ao salvar anexo", e);
             }
         }
 

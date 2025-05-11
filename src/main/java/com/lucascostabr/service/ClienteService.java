@@ -4,6 +4,7 @@ import com.lucascostabr.domain.Cliente;
 import com.lucascostabr.dto.request.ClienteRequestDTO;
 import com.lucascostabr.dto.response.ClienteResponseDTO;
 import com.lucascostabr.enums.TipoPerfil;
+import com.lucascostabr.exception.ResourceNotFoundException;
 import com.lucascostabr.mapper.ClienteMapper;
 import com.lucascostabr.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +45,14 @@ public class ClienteService {
         logger.info("Buscando um Cliente");
 
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
     }
 
     public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO dto) {
         logger.info("Atualizando um Cliente");
 
         Cliente entity = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 
         entity.setNome(dto.nome());
         entity.setEmail(dto.email());
@@ -67,7 +68,7 @@ public class ClienteService {
         logger.info("Deletando um Cliente");
 
         clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 
         clienteRepository.deleteById(id);
     }

@@ -7,6 +7,7 @@ import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.ChamadoRequestDTO;
 import com.lucascostabr.dto.response.ChamadoResponseDTO;
 import com.lucascostabr.enums.Status;
+import com.lucascostabr.exception.ResourceNotFoundException;
 import com.lucascostabr.mapper.ChamadoMapper;
 import com.lucascostabr.repository.ChamadoRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,6 @@ public class ChamadoService {
     private final ClienteService clienteService;
     private final TecnicoService tecnicoService;
     private final AnexoService anexoService;
-
 
     public ChamadoResponseDTO criar(ChamadoRequestDTO dto, List<MultipartFile> arquivos) {
         logger.info("Criando um Chamado!");
@@ -65,14 +65,14 @@ public class ChamadoService {
         logger.info("Buscando um Chamado!");
 
         return chamadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chamado não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Chamado não encontrado"));
     }
 
     public ChamadoResponseDTO atualizar(Long id, Status status) {
         logger.info("Atualizar um Chamado!");
 
         var chamado = chamadoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Chamado não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Chamado não encontrado"));
 
         chamado.setStatus(status);
 
