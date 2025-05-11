@@ -28,7 +28,7 @@ public class Chamado implements Serializable {
     @Column(nullable = false, length = 100)
     private String titulo;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String descricao;
 
     @Enumerated(EnumType.STRING)

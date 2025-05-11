@@ -1,5 +1,6 @@
 package com.lucascostabr.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -20,6 +21,7 @@ import java.util.Set;
 public class Cliente extends Usuario{
     private static final long serialVersionUID = 1L;
 
+    @Column(nullable = false)
     private String empresa;
 
     @OneToMany(mappedBy = "cliente")

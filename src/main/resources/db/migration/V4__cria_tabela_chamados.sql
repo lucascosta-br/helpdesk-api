@@ -1,7 +1,7 @@
 CREATE TABLE chamados (
     id SERIAL PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
-    descricao TEXT,
+    descricao TEXT NOT NULL,
     status VARCHAR(20) NOT NULL,
     prioridade VARCHAR(20) NOT NULL,
     categoria VARCHAR(50) NOT NULL,
