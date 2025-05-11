@@ -6,6 +6,7 @@ import com.lucascostabr.domain.Cliente;
 import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.ChamadoRequestDTO;
 import com.lucascostabr.dto.response.ChamadoResponseDTO;
+import com.lucascostabr.enums.Status;
 import com.lucascostabr.mapper.ChamadoMapper;
 import com.lucascostabr.repository.ChamadoRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -51,6 +53,8 @@ public class ChamadoService {
     }
 
     public List<ChamadoResponseDTO> listarTodos() {
+        logger.info("Listando Chamados!");
+
         return chamadoRepository.findAll()
                 .stream()
                 .map(chamadoMapper::toDTO)
@@ -58,8 +62,27 @@ public class ChamadoService {
     }
 
     public Chamado buscarPorId(Long id) {
+        logger.info("Buscando um Chamado!");
+
         return chamadoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Chamado não encontrado"));
+    }
+
+    public ChamadoResponseDTO atualizar(Long id, Status status) {
+        logger.info("Atualizar um Chamado!");
+
+        var chamado = chamadoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Chamado não encontrado"));
+
+        chamado.setStatus(status);
+
+        if (status == Status.CONCLUIDO) {
+            chamado.setDataFechamento(LocalDateTime.now());
+        }
+
+        var chamadoAtualizado = chamadoRepository.save(chamado);
+
+        return chamadoMapper.toDTO(chamadoAtualizado);
     }
 
 }

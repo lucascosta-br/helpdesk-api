@@ -23,6 +23,8 @@ public class AnexoService {
     private final AnexoRepository anexoRepository;
 
     public List<Anexo> salvar(List<MultipartFile> arquivos, Chamado chamado) {
+        logger.info("Salvando Anexo");
+
         List<Anexo> anexos = new ArrayList<>();
 
         for (MultipartFile arquivo : arquivos) {
@@ -41,6 +43,8 @@ public class AnexoService {
     }
 
     public List<AnexoResponseDTO> listarPorChamado(Long chamadoId) {
+        logger.info("Listando Anexo por Chamado");
+
         return anexoRepository.findByChamadoId(chamadoId)
                 .stream()
                 .map(anexo -> new AnexoResponseDTO(

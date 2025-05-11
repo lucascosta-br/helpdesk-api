@@ -47,4 +47,33 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
     }
 
+    public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO dto) {
+        logger.info("Atualizando um Cliente");
+
+        Cliente entity = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        if (dto == null) {
+            throw new RuntimeException("Parâmetros de atualização obrigatórios");
+        } // TODO: retirar depois que passar as annotations no dto request com a mensagem
+
+        entity.setNome(dto.nome());
+        entity.setEmail(dto.email());
+        entity.setSenha(dto.senha());
+        entity.setEmpresa(dto.empresa());
+
+        var entitySalvo = clienteRepository.save(entity);
+
+        return clienteMapper.toDTO(entitySalvo);
+    }
+
+    public void deletar(Long id) {
+        logger.info("Deletando um Cliente");
+
+        clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        clienteRepository.deleteById(id);
+    }
+
 }

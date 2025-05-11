@@ -47,4 +47,33 @@ public class TecnicoService {
                 .orElseThrow(() -> new RuntimeException("Técnico não encontrado"));
     }
 
+    public TecnicoResponseDTO atualizar(Long id, TecnicoRequestDTO dto) {
+        logger.info("Atualizando um Técnico!");
+
+        Tecnico entity = tecnicoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Técnico não encontrado"));
+
+        if (dto == null) {
+            throw new RuntimeException("Parâmetros de atualização obrigatórios");
+        } // TODO: retirar depois que passar as annotations no dto request com a mensagem
+
+        entity.setNome(dto.nome());
+        entity.setEmail(dto.email());
+        entity.setSenha(dto.senha());
+        entity.setSetor(dto.setor());
+
+        var entitySalvo = tecnicoRepository.save(entity);
+
+        return tecnicoMapper.toDTO(entitySalvo);
+    }
+
+    public void deletar(Long id) {
+        logger.info("Deletando um Técnico!");
+
+        tecnicoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Técnico não encontrado"));
+
+        tecnicoRepository.deleteById(id);
+    }
+
 }
