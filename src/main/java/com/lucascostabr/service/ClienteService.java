@@ -53,10 +53,6 @@ public class ClienteService {
         Cliente entity = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        if (dto == null) {
-            throw new RuntimeException("Parâmetros de atualização obrigatórios");
-        } // TODO: retirar depois que passar as annotations no dto request com a mensagem
-
         entity.setNome(dto.nome());
         entity.setEmail(dto.email());
         entity.setSenha(dto.senha());
