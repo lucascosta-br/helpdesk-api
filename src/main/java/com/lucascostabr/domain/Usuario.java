@@ -46,4 +46,9 @@ public abstract class Usuario implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoPerfil perfil;
+
+    @PrePersist
+    public void prePersist() {
+        this.dataCriacao = LocalDateTime.now();
+    }
 }

@@ -3,6 +3,7 @@ package com.lucascostabr.dto.request;
 import com.lucascostabr.enums.Categoria;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.br.CPF;
 
 public record TecnicoRequestDTO(
@@ -16,7 +17,7 @@ public record TecnicoRequestDTO(
         String cpf,
         @NotBlank(message = "A senha é obrigatória")
         String senha,
-        @NotBlank(message = "O setor é obrigatório")
+        @NotNull(message = "O setor é obrigatório")
         Categoria setor
 ) {
 }
