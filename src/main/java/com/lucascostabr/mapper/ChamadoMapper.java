@@ -10,10 +10,12 @@ import org.mapstruct.Mapping;
 public interface ChamadoMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", expression = "java(StatusChamado.ABERTO)")
+    @Mapping(target = "status", expression = "java(Status.ABERTO)")
     @Mapping(target = "dataAbertura", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "dataFechamento", ignore = true)
     @Mapping(target = "anexos", ignore = true)
+    @Mapping(target = "cliente", ignore = true)
+    @Mapping(target = "tecnico", ignore = true)
     Chamado toEntity(ChamadoRequestDTO dto);
 
     ChamadoResponseDTO toDTO(Chamado entity);

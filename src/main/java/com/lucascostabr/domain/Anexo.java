@@ -22,6 +22,7 @@ public class Anexo implements Serializable {
     private String nomeArquivo;
 
     @Lob
+    @Column(nullable = false, columnDefinition = "BYTEA")
     private byte[] dados;
 
     @ManyToOne

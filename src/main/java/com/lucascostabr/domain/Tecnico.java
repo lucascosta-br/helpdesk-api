@@ -4,14 +4,17 @@ import com.lucascostabr.enums.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+@Entity
+@Table(name = "tecnicos")
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class Tecnico extends Usuario{
     private static final long serialVersionUID = 1L;
