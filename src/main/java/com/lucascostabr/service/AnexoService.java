@@ -3,44 +3,46 @@ package com.lucascostabr.service;
 import com.lucascostabr.domain.Anexo;
 import com.lucascostabr.domain.Chamado;
 import com.lucascostabr.dto.response.AnexoResponseDTO;
-import com.lucascostabr.exception.FileNotSavedException;
+import com.lucascostabr.exception.ResourceNotFoundException;
+import com.lucascostabr.mapper.AnexoMapper;
 import com.lucascostabr.repository.AnexoRepository;
+import com.lucascostabr.repository.ChamadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AnexoService {
 
-    private final Logger logger = LoggerFactory.getLogger(AnexoService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnexoService.class);
 
     private final AnexoRepository anexoRepository;
+    private final AnexoMapper anexoMapper;
+    private final ChamadoRepository chamadoRepository;
+    private final ArmazenamentoArquivoService armazenamentoArquivoService;
 
-    public List<Anexo> salvar(List<MultipartFile> arquivos, Chamado chamado) {
+    public AnexoResponseDTO salvar(Long chamadoId, MultipartFile arquivo) {
         logger.info("Salvando Anexo");
 
-        List<Anexo> anexos = new ArrayList<>();
+        Chamado chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chamado não encontrado"));
 
-        for (MultipartFile arquivo : arquivos) {
-            try {
-                Anexo anexo = new Anexo();
-                anexo.setNomeArquivo(arquivo.getOriginalFilename());
-                anexo.setDados(arquivo.getBytes());
-                anexo.setChamado(chamado);
-                anexos.add(anexo);
-            } catch (IOException e) {
-                throw new FileNotSavedException("Erro ao salvar anexo", e);
-            }
-        }
+        String nomeArquivo = armazenamentoArquivoService.armazenarArquivo(arquivo);
 
-        return anexoRepository.saveAll(anexos);
+        Anexo anexo = new Anexo();
+        anexo.setNome(nomeArquivo);
+        anexo.setTipo(arquivo.getContentType());
+        anexo.setCaminho(nomeArquivo);
+        anexo.setTamanho(arquivo.getSize());
+        anexo.setChamado(chamado);
+
+        Anexo anexoSalvo = anexoRepository.save(anexo);
+        return anexoMapper.toDTO(anexoSalvo);
     }
 
     public List<AnexoResponseDTO> listarPorChamado(Long chamadoId) {
@@ -50,7 +52,10 @@ public class AnexoService {
                 .stream()
                 .map(anexo -> new AnexoResponseDTO(
                         anexo.getId(),
-                        anexo.getNomeArquivo()
+                        anexo.getNome(),
+                        anexo.getTipo(),
+                        anexo.getCaminho(),
+                        anexo.getTamanho()
                 ))
                 .toList();
     }

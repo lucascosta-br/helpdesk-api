@@ -18,14 +18,18 @@ public class Anexo implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome_arquivo", nullable = false, length = 255)
-    private String nomeArquivo;
+    @Column(nullable = false, length = 150)
+    private String nome;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "BYTEA")
-    private byte[] dados;
+    @Column(nullable = false, length = 10)
+    private String tipo;
+
+    @Column(nullable = false, length = 150)
+    private String caminho;
+
+    private Long tamanho;
 
     @ManyToOne
-    @JoinColumn(name = "chamado_id")
+    @JoinColumn(name = "chamado_id", nullable = false)
     private Chamado chamado;
 }
