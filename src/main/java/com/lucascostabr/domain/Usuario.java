@@ -1,6 +1,7 @@
 package com.lucascostabr.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lucascostabr.enums.TipoPerfil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -37,6 +38,7 @@ public abstract class Usuario implements Serializable {
     private String cpf;
 
     @Column(nullable = false, length = 255)
+    @JsonIgnore
     private String senha;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
