@@ -1,17 +1,15 @@
 package com.lucascostabr.controller;
 
-import com.lucascostabr.domain.Chamado;
 import com.lucascostabr.dto.request.ChamadoRequestDTO;
 import com.lucascostabr.dto.request.ChamadoStatusRequestDTO;
 import com.lucascostabr.dto.response.ChamadoResponseDTO;
+import com.lucascostabr.mapper.ChamadoMapper;
 import com.lucascostabr.service.ChamadoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,11 +19,11 @@ import java.util.List;
 public class ChamadoController {
 
     private final ChamadoService chamadoService;
+    private final ChamadoMapper chamadoMapper;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ChamadoResponseDTO> criar(@RequestPart("chamado") ChamadoRequestDTO dto,
-                                                    @RequestPart(value = "arquivos", required = false)List<MultipartFile> arquivos) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(chamadoService.criar(dto, arquivos));
+    @PostMapping
+    public ResponseEntity<ChamadoResponseDTO> criar(@RequestBody @Valid ChamadoRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(chamadoService.criar(dto));
     }
 
     @GetMapping
@@ -33,9 +31,10 @@ public class ChamadoController {
         return ResponseEntity.ok(chamadoService.listarTodos());
     }
 
-    @GetMapping("/{id}/status")
-    public ResponseEntity<Chamado> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(chamadoService.buscarPorId(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<ChamadoResponseDTO> buscarPorId(@PathVariable Long id) {
+        var chamado = chamadoService.buscarPorId(id);
+        return ResponseEntity.ok(chamadoMapper.toDTO(chamado));
     }
 
     @PutMapping("/{id}")
