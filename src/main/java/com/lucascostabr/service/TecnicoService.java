@@ -3,6 +3,7 @@ package com.lucascostabr.service;
 import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.TecnicoRequestDTO;
 import com.lucascostabr.dto.response.TecnicoResponseDTO;
+import com.lucascostabr.enums.Categoria;
 import com.lucascostabr.enums.TipoPerfil;
 import com.lucascostabr.exception.ResourceNotFoundException;
 import com.lucascostabr.mapper.TecnicoMapper;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +73,10 @@ public class TecnicoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
 
         tecnicoRepository.deleteById(id);
+    }
+
+    public Optional<Tecnico> buscarPorCategoria(Categoria categoria) {
+        return tecnicoRepository.findFirstBySetor(categoria);
     }
 
 }
