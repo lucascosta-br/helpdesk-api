@@ -11,9 +11,9 @@ import com.lucascostabr.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +33,11 @@ public class ClienteService {
         return clienteMapper.toDTO(clienteSalvo);
     }
 
-    public List<ClienteResponseDTO> listarTodos() {
-        logger.info("Listando todos os Clientes!");
+    public Page<ClienteResponseDTO> listarTodos(Pageable pageable) {
+        logger.info("Listando todos os Clientes com Paginação e Ordenação!");
 
-        return clienteRepository.findAll()
-                .stream()
-                .map(clienteMapper::toDTO)
-                .toList();
+        return clienteRepository.findAll(pageable)
+                .map(clienteMapper::toDTO);
     }
 
     public Cliente buscarPorId(Long id) {

@@ -13,10 +13,11 @@ import com.lucascostabr.repository.ChamadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,13 +45,11 @@ public class ChamadoService {
         return chamadoMapper.toDTO(chamadoSalvo);
     }
 
-    public List<ChamadoResponseDTO> listarTodos() {
-        logger.info("Listando Chamados!");
+    public Page<ChamadoResponseDTO> listarTodos(Pageable pageable) {
+        logger.info("Listando Chamados com Paginação e Ordenação!");
 
-        return chamadoRepository.findAll()
-                .stream()
-                .map(chamadoMapper::toDTO)
-                .toList();
+        return chamadoRepository.findAll(pageable)
+                .map(chamadoMapper::toDTO);
     }
 
     public Chamado buscarPorId(Long id) {

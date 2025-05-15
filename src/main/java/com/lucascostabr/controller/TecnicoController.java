@@ -7,11 +7,13 @@ import com.lucascostabr.dto.response.TecnicoResponseDTO;
 import com.lucascostabr.service.TecnicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tecnicos")
@@ -26,8 +28,13 @@ public class TecnicoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TecnicoResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(tecnicoService.listarTodos());
+    public ResponseEntity<Page<TecnicoResponseDTO>> listarTodos(
+            @PageableDefault(
+                    page = 0,
+                    size = 12,
+                    sort = "id",
+                    direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(tecnicoService.listarTodos(pageable));
     }
 
     @GetMapping("/{id}")

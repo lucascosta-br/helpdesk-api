@@ -12,9 +12,10 @@ import com.lucascostabr.repository.TecnicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,13 +36,11 @@ public class TecnicoService {
         return tecnicoMapper.toDTO(tecnicoSalvo);
     }
 
-    public List<TecnicoResponseDTO> listarTodos() {
-        logger.info("Listando todos os Técnicos!");
+    public Page<TecnicoResponseDTO> listarTodos(Pageable pageable) {
+        logger.info("Listando todos os Técnicos com Paginação e Ordenação!");
 
-        return tecnicoRepository.findAll()
-                .stream()
-                .map(tecnicoMapper::toDTO)
-                .toList();
+        return tecnicoRepository.findAll(pageable)
+                .map(tecnicoMapper::toDTO);
     }
 
     public Tecnico buscarPorId(Long id) {
