@@ -34,7 +34,7 @@ public class ChamadoService {
         logger.info("Criando um Chamado!");
 
         Chamado chamado = chamadoMapper.toEntity(dto);
-        Cliente cliente = clienteService.buscarPorId(dto.clienteId());
+        Cliente cliente = clienteService.buscarEntidadePorId(dto.clienteId());
         chamado.setCliente(cliente);
 
         Tecnico tecnico = tecnicoService.buscarPorCategoria(dto.categoria())
@@ -52,10 +52,11 @@ public class ChamadoService {
                 .map(chamadoMapper::toDTO);
     }
 
-    public Chamado buscarPorId(Long id) {
+    public ChamadoResponseDTO buscarPorId(Long id) {
         logger.info("Buscando um Chamado!");
 
         return chamadoRepository.findById(id)
+                .map(chamadoMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Chamado não encontrado"));
     }
 

@@ -40,8 +40,16 @@ public class ClienteService {
                 .map(clienteMapper::toDTO);
     }
 
-    public Cliente buscarPorId(Long id) {
+    public ClienteResponseDTO buscarPorId(Long id) {
         logger.info("Buscando um Cliente");
+
+        return clienteRepository.findById(id)
+                .map(clienteMapper::toDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+    }
+
+    public Cliente buscarEntidadePorId(Long id) {
+        logger.info("Buscando Cliente ENTIDADE");
 
         return clienteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));

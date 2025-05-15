@@ -43,10 +43,11 @@ public class TecnicoService {
                 .map(tecnicoMapper::toDTO);
     }
 
-    public Tecnico buscarPorId(Long id) {
+    public TecnicoResponseDTO buscarPorId(Long id) {
         logger.info("Buscando um Técnico!");
 
         return tecnicoRepository.findById(id)
+                .map(tecnicoMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
     }
 
