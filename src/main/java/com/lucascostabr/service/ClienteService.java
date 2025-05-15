@@ -2,6 +2,7 @@ package com.lucascostabr.service;
 
 import com.lucascostabr.domain.Cliente;
 import com.lucascostabr.dto.request.ClienteRequestDTO;
+import com.lucascostabr.dto.request.ClienteUpdateRequestDTO;
 import com.lucascostabr.dto.response.ClienteResponseDTO;
 import com.lucascostabr.enums.TipoPerfil;
 import com.lucascostabr.exception.ResourceNotFoundException;
@@ -48,7 +49,7 @@ public class ClienteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
     }
 
-    public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO dto) {
+    public ClienteResponseDTO atualizar(Long id, ClienteUpdateRequestDTO dto) {
         logger.info("Atualizando um Cliente");
 
         Cliente entity = clienteRepository.findById(id)

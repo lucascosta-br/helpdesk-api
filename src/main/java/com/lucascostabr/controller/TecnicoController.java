@@ -2,6 +2,7 @@ package com.lucascostabr.controller;
 
 import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.TecnicoRequestDTO;
+import com.lucascostabr.dto.request.TecnicoUpdateRequestDTO;
 import com.lucascostabr.dto.response.TecnicoResponseDTO;
 import com.lucascostabr.service.TecnicoService;
 import jakarta.validation.Valid;
@@ -36,7 +37,7 @@ public class TecnicoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TecnicoResponseDTO> atualizar(@PathVariable Long id,
-                                                        @RequestBody @Valid TecnicoRequestDTO dto) {
+                                                        @RequestBody @Valid TecnicoUpdateRequestDTO dto) {
         return ResponseEntity.ok(tecnicoService.atualizar(id, dto));
     }
 

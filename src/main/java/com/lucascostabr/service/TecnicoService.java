@@ -2,6 +2,7 @@ package com.lucascostabr.service;
 
 import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.TecnicoRequestDTO;
+import com.lucascostabr.dto.request.TecnicoUpdateRequestDTO;
 import com.lucascostabr.dto.response.TecnicoResponseDTO;
 import com.lucascostabr.enums.Categoria;
 import com.lucascostabr.enums.TipoPerfil;
@@ -50,7 +51,7 @@ public class TecnicoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
     }
 
-    public TecnicoResponseDTO atualizar(Long id, TecnicoRequestDTO dto) {
+    public TecnicoResponseDTO atualizar(Long id, TecnicoUpdateRequestDTO dto) {
         logger.info("Atualizando um Técnico!");
 
         Tecnico entity = tecnicoRepository.findById(id)

@@ -2,6 +2,7 @@ package com.lucascostabr.controller;
 
 import com.lucascostabr.domain.Cliente;
 import com.lucascostabr.dto.request.ClienteRequestDTO;
+import com.lucascostabr.dto.request.ClienteUpdateRequestDTO;
 import com.lucascostabr.dto.response.ClienteResponseDTO;
 import com.lucascostabr.service.ClienteService;
 import jakarta.validation.Valid;
@@ -36,7 +37,7 @@ public class ClienteController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> atualizar(@PathVariable Long id,
-                                                        @RequestBody @Valid ClienteRequestDTO dto) {
+                                                        @RequestBody @Valid ClienteUpdateRequestDTO dto) {
         return ResponseEntity.ok(clienteService.atualizar(id, dto));
     }
 
