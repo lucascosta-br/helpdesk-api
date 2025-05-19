@@ -6,10 +6,11 @@ import com.lucascostabr.dto.response.ClienteResponseDTO;
 import com.lucascostabr.service.ClienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class ClienteController {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
     })
-    public ResponseEntity<Page<ClienteResponseDTO>> listarTodos(
+    public ResponseEntity<PagedModel<EntityModel<ClienteResponseDTO>>> listarTodos(
             @PageableDefault(
                     page = 0,
                     size = 12,

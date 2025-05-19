@@ -6,10 +6,11 @@ import com.lucascostabr.dto.response.TecnicoResponseDTO;
 import com.lucascostabr.service.TecnicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class TecnicoController {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
     })
-    public ResponseEntity<Page<TecnicoResponseDTO>> listarTodos(
+    public ResponseEntity<PagedModel<EntityModel<TecnicoResponseDTO>>> listarTodos(
             @PageableDefault(
                     page = 0,
                     size = 12,

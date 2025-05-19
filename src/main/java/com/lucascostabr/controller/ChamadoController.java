@@ -6,10 +6,11 @@ import com.lucascostabr.dto.response.ChamadoResponseDTO;
 import com.lucascostabr.service.ChamadoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class ChamadoController {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
     })
-    public ResponseEntity<Page<ChamadoResponseDTO>> listarTodos(
+    public ResponseEntity<PagedModel<EntityModel<ChamadoResponseDTO>>> listarTodos(
             @PageableDefault(
                     page = 0,
                     size = 12,
@@ -66,6 +67,12 @@ public class ChamadoController {
         ChamadoResponseDTO response = chamadoService.atualizar(id, dto.status());
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        chamadoService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

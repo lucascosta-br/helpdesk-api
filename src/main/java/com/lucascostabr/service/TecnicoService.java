@@ -1,5 +1,6 @@
 package com.lucascostabr.service;
 
+import com.lucascostabr.controller.TecnicoController;
 import com.lucascostabr.domain.Tecnico;
 import com.lucascostabr.dto.request.TecnicoRequestDTO;
 import com.lucascostabr.dto.request.TecnicoUpdateRequestDTO;
@@ -14,9 +15,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +34,7 @@ public class TecnicoService {
 
     private final TecnicoRepository tecnicoRepository;
     private final TecnicoMapper tecnicoMapper;
+    private final PagedResourcesAssembler<TecnicoResponseDTO> assembler;
 
     public TecnicoResponseDTO criar(TecnicoRequestDTO dto) {
         logger.info("Criando um Técnico!");
@@ -33,22 +42,26 @@ public class TecnicoService {
         Tecnico entity = tecnicoMapper.toEntity(dto);
         entity.setPerfil(TipoPerfil.TECNICO);
         Tecnico tecnicoSalvo = tecnicoRepository.save(entity);
-        return tecnicoMapper.toDTO(tecnicoSalvo);
+        var responseDTO = tecnicoMapper.toDTO(tecnicoSalvo);
+        adicionarLinks(responseDTO);
+        return responseDTO;
     }
 
-    public Page<TecnicoResponseDTO> listarTodos(Pageable pageable) {
+    public PagedModel<EntityModel<TecnicoResponseDTO>> listarTodos(Pageable pageable) {
         logger.info("Listando todos os Técnicos com Paginação e Ordenação!");
 
-        return tecnicoRepository.findAll(pageable)
-                .map(tecnicoMapper::toDTO);
+        var tecnico = tecnicoRepository.findAll(pageable);
+        return gerarModeloPaginado(pageable, tecnico);
     }
 
     public TecnicoResponseDTO buscarPorId(Long id) {
         logger.info("Buscando um Técnico!");
 
-        return tecnicoRepository.findById(id)
+        var dto = tecnicoRepository.findById(id)
                 .map(tecnicoMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Técnico não encontrado"));
+        adicionarLinks(dto);
+        return dto;
     }
 
     public TecnicoResponseDTO atualizar(Long id, TecnicoUpdateRequestDTO dto) {
@@ -64,7 +77,9 @@ public class TecnicoService {
 
         var entitySalvo = tecnicoRepository.save(entity);
 
-        return tecnicoMapper.toDTO(entitySalvo);
+        var responseDTO = tecnicoMapper.toDTO(entitySalvo);
+        adicionarLinks(responseDTO);
+        return responseDTO;
     }
 
     public void deletar(Long id) {
@@ -78,6 +93,26 @@ public class TecnicoService {
 
     public Optional<Tecnico> buscarPorCategoria(Categoria categoria) {
         return tecnicoRepository.findFirstBySetor(categoria);
+    }
+
+    private PagedModel<EntityModel<TecnicoResponseDTO>> gerarModeloPaginado(Pageable pageable, Page<Tecnico> tecnicos) {
+        var tecnicoComLinks = tecnicos.map(tec -> {
+            var responseDto = tecnicoMapper.toDTO(tec);
+            adicionarLinks(responseDto);
+            return responseDto;
+        });
+
+        Link listarTodosLinks = linkTo(methodOn(TecnicoController.class).listarTodos(pageable)).withSelfRel();
+
+        return assembler.toModel(tecnicoComLinks, listarTodosLinks);
+    }
+
+    private void adicionarLinks(TecnicoResponseDTO dto) {
+        dto.add(linkTo(methodOn(TecnicoController.class).criar(null)).withRel("criar").withType("POST"));
+        dto.add(linkTo(methodOn(TecnicoController.class).listarTodos(null)).withRel("listarTodos").withType("GET"));
+        dto.add(linkTo(methodOn(TecnicoController.class).buscarPorId(dto.getId())).withRel("buscarPorId").withType("GET"));
+        dto.add(linkTo(methodOn(TecnicoController.class).atualizar(dto.getId(), null)).withRel("atualizar").withType("PUT"));
+        dto.add(linkTo(methodOn(TecnicoController.class).deletar(dto.getId())).withRel("deletar").withType("DELETE"));
     }
 
 }

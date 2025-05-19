@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 public interface ChamadoMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", expression = "java(Status.ABERTO)")
+    @Mapping(target = "status", expression = "java(com.lucascostabr.enums.Status.ABERTO)")
     @Mapping(target = "dataAbertura", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "dataFechamento", ignore = true)
     @Mapping(target = "anexos", ignore = true)
