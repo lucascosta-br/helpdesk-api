@@ -6,7 +6,11 @@ import com.lucascostabr.dto.request.ClienteRequestDTO;
 import com.lucascostabr.dto.request.ClienteUpdateRequestDTO;
 import com.lucascostabr.dto.response.ClienteResponseDTO;
 import com.lucascostabr.enums.TipoPerfil;
+import com.lucascostabr.exception.BadRequestException;
+import com.lucascostabr.exception.FileStorageException;
 import com.lucascostabr.exception.ResourceNotFoundException;
+import com.lucascostabr.file.importer.contract.ImportadorArquivoCliente;
+import com.lucascostabr.file.importer.factory.ImportadorArquivoClienteFactory;
 import com.lucascostabr.mapper.ClienteMapper;
 import com.lucascostabr.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,13 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -32,6 +43,7 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
     private final PagedResourcesAssembler<ClienteResponseDTO> assembler;
+    private final ImportadorArquivoClienteFactory importadorArquivoClienteFactory;
 
     public ClienteResponseDTO criar(ClienteRequestDTO dto) {
         logger.info("Criando um Cliente!");
@@ -42,6 +54,47 @@ public class ClienteService {
         var responseDTO = clienteMapper.toDTO(clienteSalvo);
         adicionarLinks(responseDTO);
         return responseDTO;
+    }
+
+    public List<ClienteResponseDTO> criarVarios(MultipartFile arquivo) {
+        logger.info("Importando vários Clientes via arquivos!");
+
+        if (arquivo == null || arquivo.isEmpty()) {
+            throw new BadRequestException("Por favor envie um arquivo válido");
+        }
+
+        String nomeArquivo = Optional.ofNullable(arquivo.getOriginalFilename())
+                .orElseThrow(() -> new BadRequestException("O nome do arquivo não pode ser nulo"));
+
+        if (!nomeArquivo.toLowerCase().endsWith(".csv") && !nomeArquivo.toLowerCase().endsWith(".xlsx")) {
+            throw new BadRequestException("Formato de arquivo inválido. Use CSV ou XLSX");
+        }
+
+        try (InputStream inputStream = arquivo.getInputStream()) {
+            ImportadorArquivoCliente importador = importadorArquivoClienteFactory.buscarImportador(nomeArquivo);
+            List<ClienteRequestDTO> dtos = importador.importarArquivo(inputStream);
+
+            if (dtos.isEmpty()) {
+                throw new BadRequestException("O arquivo não contém dados para importação");
+            }
+
+            return dtos.stream()
+                    .map(dto -> {
+                        Cliente entity = clienteMapper.toEntity(dto);
+                        entity.setPerfil(TipoPerfil.CLIENTE);
+                        Cliente saved = clienteRepository.save(entity);
+                        ClienteResponseDTO response = clienteMapper.toDTO(saved);
+                        adicionarLinks(response);
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error("Erro ao importar clientes: " + e.getMessage(), e);
+
+            throw new FileStorageException("Erro ao processar o arquivo: " + e.getMessage(), e);
+        }
     }
 
     public PagedModel<EntityModel<ClienteResponseDTO>> listarTodos(Pageable pageable) {
