@@ -2,6 +2,7 @@ package com.lucascostabr.file.importer.impl;
 
 import com.lucascostabr.dto.request.ClienteRequestDTO;
 import com.lucascostabr.file.importer.contract.ImportadorArquivoCliente;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -43,14 +44,47 @@ public class XlsxImporterCliente implements ImportadorArquivoCliente {
     }
 
     private ClienteRequestDTO parseRowClienteDTO(Row row) {
+        if (row == null) {
+            throw new RuntimeException("Linha nula encontrada no arquivo");
+        }
+
         ClienteRequestDTO dto = new ClienteRequestDTO(
-                row.getCell(0).getStringCellValue(),
-                row.getCell(1).getStringCellValue(),
-                row.getCell(2).getStringCellValue(),
-                row.getCell(3).getStringCellValue(),
-                row.getCell(4).getStringCellValue()
+                getCellStringValue(row.getCell(0)),
+                getCellStringValue(row.getCell(1)),
+                getCellStringValue(row.getCell(2)),
+                getCellStringValue(row.getCell(3)),
+                getCellStringValue(row.getCell(4))
         );
         return dto;
+    }
+
+    private String getCellStringValue(Cell cell) {
+        if (cell == null) return null;
+
+        try {
+            return switch (cell.getCellType()) {
+                case STRING -> cell.getStringCellValue().trim();
+                case NUMERIC -> {
+                    double numValue = cell.getNumericCellValue();
+                    // Verifica se é inteiro
+                    if (numValue == Math.floor(numValue)) {
+                        yield String.valueOf((long) numValue);
+                    }
+                    yield String.valueOf(numValue);
+                }
+                case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+                case FORMULA -> switch (cell.getCachedFormulaResultType()) {
+                    case STRING -> cell.getStringCellValue();
+                    case NUMERIC -> String.valueOf(cell.getNumericCellValue());
+                    case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+                    default -> null;
+                };
+                case BLANK -> null;
+                default -> null;
+            };
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao ler valor da célula: " + e.getMessage());
+        }
     }
 
     private static boolean isRowValid(Row row) {

@@ -18,5 +18,4 @@ public class ClienteResponseDTO extends RepresentationModel<ClienteResponseDTO> 
     private String cpf;
     private String empresa;
     private TipoPerfil perfil;
-
 }

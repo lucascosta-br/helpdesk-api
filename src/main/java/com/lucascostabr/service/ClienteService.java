@@ -7,8 +7,11 @@ import com.lucascostabr.dto.request.ClienteUpdateRequestDTO;
 import com.lucascostabr.dto.response.ClienteResponseDTO;
 import com.lucascostabr.enums.TipoPerfil;
 import com.lucascostabr.exception.BadRequestException;
+import com.lucascostabr.exception.ExportNotFoundException;
 import com.lucascostabr.exception.FileStorageException;
 import com.lucascostabr.exception.ResourceNotFoundException;
+import com.lucascostabr.file.exporter.contract.ExportadorArquivoCliente;
+import com.lucascostabr.file.exporter.factory.ExportadorArquivoClienteFactory;
 import com.lucascostabr.file.importer.contract.ImportadorArquivoCliente;
 import com.lucascostabr.file.importer.factory.ImportadorArquivoClienteFactory;
 import com.lucascostabr.mapper.ClienteMapper;
@@ -16,6 +19,7 @@ import com.lucascostabr.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -44,6 +48,7 @@ public class ClienteService {
     private final ClienteMapper clienteMapper;
     private final PagedResourcesAssembler<ClienteResponseDTO> assembler;
     private final ImportadorArquivoClienteFactory importadorArquivoClienteFactory;
+    private final ExportadorArquivoClienteFactory exportadorArquivoClienteFactory;
 
     public ClienteResponseDTO criar(ClienteRequestDTO dto) {
         logger.info("Criando um Cliente!");
@@ -94,6 +99,20 @@ public class ClienteService {
             logger.error("Erro ao importar clientes: " + e.getMessage(), e);
 
             throw new FileStorageException("Erro ao processar o arquivo: " + e.getMessage(), e);
+        }
+    }
+
+    public Resource exportarTodos(Pageable pageable, String acceptHeader) {
+        logger.info("Exportando todos os Clientes!");
+
+        var cliente = clienteRepository.findAll(pageable)
+                .map(clienteMapper::toDTO).getContent();
+
+        try {
+            ExportadorArquivoCliente exportador = this.exportadorArquivoClienteFactory.buscarExportador(acceptHeader);
+            return exportador.exportadorArquivo(cliente);
+        } catch (Exception e) {
+            throw new ExportNotFoundException("Erro durante a exportação de arquivo", e);
         }
     }
 
@@ -162,10 +181,12 @@ public class ClienteService {
 
     private void adicionarLinks(ClienteResponseDTO dto) {
         dto.add(linkTo(methodOn(ClienteController.class).criar(null)).withRel("criar").withType("POST"));
+        dto.add(linkTo(methodOn(ClienteController.class)).slash("criarVarios").withRel("criarVarios").withType("POST"));
         dto.add(linkTo(methodOn(ClienteController.class).listarTodos(null)).withRel("listarTodos").withType("GET"));
         dto.add(linkTo(methodOn(ClienteController.class).buscarPorId(dto.getId())).withRel("buscarPorId").withType("GET"));
         dto.add(linkTo(methodOn(ClienteController.class).atualizar(dto.getId(), null)).withRel("atualizar").withType("PUT"));
         dto.add(linkTo(methodOn(ClienteController.class).deletar(dto.getId())).withRel("deletar").withType("DELETE"));
+        dto.add(linkTo(methodOn(ClienteController.class).exportarTodos(null, null)).withRel("exportarTodos").withType("GET"));
     }
 
 }
