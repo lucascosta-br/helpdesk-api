@@ -38,6 +38,7 @@ public class ChamadoService {
     private final ChamadoMapper chamadoMapper;
     private final ClienteService clienteService;
     private final TecnicoService tecnicoService;
+    private final EnviaEmailService emailService;
     private final PagedResourcesAssembler<ChamadoResponseDTO> assembler;
 
     public ChamadoResponseDTO criar(ChamadoRequestDTO dto) {
@@ -101,6 +102,23 @@ public class ChamadoService {
 
         var responseDTO = chamadoMapper.toDTO(chamadoAtualizado);
         adicionarLinks(responseDTO);
+
+        if (status == Status.EM_ANDAMENTO) {
+            emailService.enviaEmail(
+                    chamado.getCliente().getEmail(),
+                    "Seu chamado #" + chamado.getId() + " está EM ANDAMENTO",
+                    "Olá " + chamado.getCliente().getNome() + ",<br><br>Seu chamado está sendo analisado por nosso técnico.<br><br>Helpdesk API"
+            );
+        }
+
+        if (status == Status.CONCLUIDO) {
+            emailService.enviaEmail(
+                    chamado.getCliente().getEmail(),
+                    "Seu chamado #" + chamado.getId() + " foi CONCLUÍDO",
+                    "Olá " + chamado.getCliente().getNome() + ",<br><br>Informamos que seu chamado foi <b>CONCLUÍDO</b>.<br><br>Obrigado por utilizar nosso sistema.<br><br>Helpdesk API"
+            );
+        }
+
         return responseDTO;
     }
 
