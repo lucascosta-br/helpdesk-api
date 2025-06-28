@@ -1,6 +1,7 @@
 package com.lucascostabr.domain;
 
 import com.lucascostabr.enums.Categoria;
+import com.lucascostabr.enums.TipoPerfil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,4 +26,12 @@ public class Tecnico extends Usuario{
 
     @OneToMany(mappedBy = "tecnico")
     private Set<Chamado> chamados = new HashSet<>();
+
+    public Tecnico(String email, String senha, TipoPerfil perfil) {
+        super(email, senha, perfil);
+    }
+
+    public Tecnico(String nome, String email, String cpf, String senhaEncriptada) {
+        super();
+    }
 }

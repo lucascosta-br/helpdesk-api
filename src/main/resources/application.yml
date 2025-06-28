@@ -37,5 +37,8 @@ spring:
           writetimeout: 5000
 file:
   upload-dir: /home/lucas/uploadDir
+jwt:
+  secret: Jg0K9vXqY7h2NfR8WzqP3LmE4aUcTbVsX9EyQpBrKdHgZcMwFl
+  expiration: 86400000 # 1 dia em milissegundos
 
 

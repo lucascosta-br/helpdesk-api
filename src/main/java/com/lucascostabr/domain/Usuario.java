@@ -9,9 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.br.CPF;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -19,7 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Usuario implements Serializable {
+public abstract class Usuario implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -49,8 +54,59 @@ public abstract class Usuario implements Serializable {
     @Column(nullable = false)
     private TipoPerfil perfil;
 
+    public Usuario(String email, String senha, TipoPerfil perfil) {
+        this.email = email;
+        this.senha = senha;
+        this.perfil = perfil;
+    }
+
     @PrePersist
     public void prePersist() {
         this.dataCriacao = LocalDateTime.now();
+    }
+
+    // Implementação do UserDetails
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if(this.perfil == TipoPerfil.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_CLIENTE"),
+                    new SimpleGrantedAuthority("ROLE_TECNICO"));
+        } else if (this.perfil == TipoPerfil.CLIENTE) {
+            return List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+        } else {
+            return List.of(new SimpleGrantedAuthority("ROLE_TECNICO"));
+        }
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 }
