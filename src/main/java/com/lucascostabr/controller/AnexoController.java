@@ -3,6 +3,8 @@ package com.lucascostabr.controller;
 import com.lucascostabr.dto.response.AnexoResponseDTO;
 import com.lucascostabr.service.AnexoService;
 import com.lucascostabr.service.ArmazenamentoArquivoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/anexos")
+@Tag(name = "Anexos", description = "Endpoints para upload e download de arquivos anexos")
 @RequiredArgsConstructor
 public class AnexoController {
     private static final Logger logger = LoggerFactory.getLogger(AnexoController.class);
@@ -28,6 +31,7 @@ public class AnexoController {
     private final AnexoService anexoService;
     private final ArmazenamentoArquivoService arquivoService;
 
+    @Operation(summary = "Upload de arquivo", description = "Realiza o upload de um arquivo para um chamado")
     @PostMapping("/upload/{chamadoId}")
     public ResponseEntity<AnexoResponseDTO> uploadArquivo(@PathVariable Long chamadoId,
                                                           @RequestParam("arquivo") MultipartFile arquivo) {
@@ -35,6 +39,7 @@ public class AnexoController {
        return ResponseEntity.status(HttpStatus.CREATED).body(anexo);
     }
 
+    @Operation(summary = "Upload de múltiplos arquivos", description = "Realiza o upload de vários arquivos para um chamado")
     @PostMapping("/uploadMultiplos/{chamadoId}")
     public List<ResponseEntity<AnexoResponseDTO>> uploadMultiplos(@PathVariable Long chamadoId,
                                                                   @RequestParam("arquivos") MultipartFile[] arquivos) {
@@ -44,12 +49,14 @@ public class AnexoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Listar anexos por chamado", description = "Retorna todos os anexos vinculados a um chamado")
     @GetMapping("/por-chamado/{chamadoId}")
     public ResponseEntity<List<AnexoResponseDTO>> listarPorChamado(@PathVariable Long chamadoId) {
         var anexos = anexoService.listarPorChamado(chamadoId);
         return ResponseEntity.ok(anexos);
     }
 
+    @Operation(summary = "Download de arquivo", description = "Realiza o download de um arquivo anexo")
     @GetMapping("/downloadFile/{nomeArquivo:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String nomeArquivo, HttpServletRequest request) {
         Resource resource = arquivoService.carregarArquivo(nomeArquivo);

@@ -35,6 +35,12 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+spring-doc:
+    paths-to-match:
+      - /api/v1/**
+      - /autenticacao/**
+    swagger-ui:
+      use-root-path: true
 file:
   upload-dir: /home/lucas/uploadDir
 jwt:

@@ -7,6 +7,8 @@ import com.lucascostabr.exception.BadRequestException;
 import com.lucascostabr.exception.FileStorageException;
 import com.lucascostabr.file.exporter.MediaTypes;
 import com.lucascostabr.service.TecnicoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +30,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/tecnicos")
+@Tag(name = "Técnicos", description = "Endpoints para gestão de técnicos")
 @RequiredArgsConstructor
 public class TecnicoController {
 
     private final TecnicoService tecnicoService;
 
+    @Operation(summary = "Criar técnico", description = "Cadastra um novo técnico")
     @PostMapping(consumes = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
@@ -44,6 +48,7 @@ public class TecnicoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(tecnicoService.criar(dto));
     }
 
+    @Operation(summary = "Criar vários técnicos via planilha", description = "Cria técnicos a partir de um arquivo CSV ou Excel")
     @PostMapping(path = "/criarVarios", produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
@@ -61,7 +66,7 @@ public class TecnicoController {
         }
     }
 
-
+    @Operation(summary = "Listar técnicos", description = "Retorna todos os técnicos paginados")
     @GetMapping(produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
@@ -75,6 +80,7 @@ public class TecnicoController {
         return ResponseEntity.ok(tecnicoService.listarTodos(pageable));
     }
 
+    @Operation(summary = "Exportar técnicos", description = "Exporta técnicos para XLSX ou CSV")
     @GetMapping(path = "/exportarTodos",
             produces = {
             MediaTypes.APPLICATION_XLSX_VALUE, MediaTypes.APPLICATION_CSV_VALUE
@@ -104,6 +110,7 @@ public class TecnicoController {
                 .body(resource);
     }
 
+    @Operation(summary = "Buscar técnico por ID", description = "Retorna os dados de um técnico específico")
     @GetMapping(value = "/{id}", produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
@@ -112,6 +119,7 @@ public class TecnicoController {
         return ResponseEntity.ok(tecnicoService.buscarPorId(id));
     }
 
+    @Operation(summary = "Atualizar técnico", description = "Atualiza os dados de um técnico")
     @PutMapping(value = "/{id}", consumes = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE
@@ -124,6 +132,7 @@ public class TecnicoController {
         return ResponseEntity.ok(tecnicoService.atualizar(id, dto));
     }
 
+    @Operation(summary = "Deletar técnico", description = "Exclui um técnico")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         tecnicoService.deletar(id);

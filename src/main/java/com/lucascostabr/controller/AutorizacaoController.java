@@ -10,6 +10,12 @@ import com.lucascostabr.enums.Categoria;
 import com.lucascostabr.enums.TipoPerfil;
 import com.lucascostabr.repository.UsuarioRepository;
 import com.lucascostabr.security.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/autenticacao")
+@Tag(name = "Autenticação", description = "Endpoints de autenticação e registro de usuários")
 public class AutorizacaoController {
 
     @Autowired
@@ -34,6 +41,12 @@ public class AutorizacaoController {
     @Autowired
     private TokenService tokenService;
 
+    @Operation(summary = "Autenticar usuário", description = "Realiza login na aplicação e retorna o JWT Token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
+                    content = @Content(schema = @Schema(implementation = AutenticacaoDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AutenticacaoDTO dto) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(dto.email(), dto.senha());
@@ -45,6 +58,12 @@ public class AutorizacaoController {
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
+    @Operation(summary = "Registrar usuário", description = "Registra um novo usuário na aplicação")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário registrado com sucesso",
+                    content = @Content(schema = @Schema(implementation = RegistroDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou e-mail já cadastrado")
+    })
     @PostMapping("/registrar")
     public ResponseEntity registrar(@RequestBody @Valid RegistroDTO dto) {
         if (this.usuarioRepository.findByEmail(dto.email()) != null) {
